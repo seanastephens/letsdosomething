@@ -13,8 +13,6 @@ $facebook = new Facebook(array(
   'code' => $_GET['code']
 ));
 
-if (!session_id()) { session_start(); }
-
 // Get User ID
 $user = $facebook->getUser();
 
