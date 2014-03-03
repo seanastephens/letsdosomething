@@ -4,6 +4,7 @@ ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
 if (!isset($_GET["genre"])) {
+    echo("No 'genre' parameter passed!");
     die();
 }
 
