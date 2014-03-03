@@ -47,16 +47,12 @@
             }
         }
 
-        function assignAll(genre, time, d) {
-
-            assigngenre(genre);
-            assigntime(time);
-            assigndate(d);
+        function assignAll(form) {
 
             FB.api('/me', "get", function (response) {
                 window.fID = response["id"];
-                window.floc = response["location"]["name"];
-                window.fgenr = "Action"; //TODO: fix assign genre 
+                //window.floc = response["location"]["name"];
+                window.fgenr = form.Genre.value; //"Action"; //TODO: fix assign genre 
                 console.log("[index.html] Response from FB.api('/me') -> ID        : " + window.fID);
                 console.log("[index.html] Response from FB.api('/me') -> Location  : " + window.floc);
                 console.log("[index.html] Response from FB.api('/me') -> Genre     : " + window.fgenr);
@@ -87,6 +83,8 @@
             var selectedopt = what.options[what.selectedIndex];
             if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
                 window.fgenr = selectedopt.value;
+                alert("selectedopt.value");
+                return selectedopt.value;
             }
         }
 
@@ -132,7 +130,7 @@
     </div>
     <div class="choices">
         <div class="list">
-            <form name="form1">
+            <form name="form" action="" method="GET">
                 <select name="Genre" size="1" onchange="displaydesc(document.form1.Genre, thetext1, 'textcontainer1')">
                     <option value="0">Movie Genre</option>
                     <option selected="selected" value="Action">Action</option>
@@ -144,10 +142,8 @@
                 </select>
                 <span id="textcontainer1" align="left" style="font:italic 18px Arial">
 		</span>
-            </form>
         </div>
         <div class="list">
-            <form name="form2">
                 <select name="Time" size="1" onchange="displaydesc(document.form1.Time, thetext2, 'textcontainer1')">
                     <option value="0">Time</option>
                     <option selected="selected" value="17">5 pm</option>
@@ -177,10 +173,8 @@
                 </select>
                 <span id="textcontainer2" align="left" style="font:italic 13px Arial">
 		</span>
-            </form>
         </div>
         <div class="list">
-            <form name="form3">
                 <select name="Date" size="1" onchange="displaydesc(document.form1.Date, thetext3, 'textcontainer1')">
                     <option selectvalue="0">DATE</option>
                     <option value="1">Sunday</option>
@@ -193,7 +187,7 @@
                 </select>
                 <span id="textcontainer3" align="left" style="font:italic 13px Arial">
 		</span>
-                <input value="Check Movies" onclick="assignAll(document.form1.Genre, document.form2.Time,document.form3.Date)" type="button">
+                <input value="Check Movies" onclick="assignAll(this.form)" type="button">
                 <br>
             </form>
         </div>
