@@ -1,0 +1,56 @@
+@charset "UTF-8";
+
+/* Styles for comman elements -------------------------------------------- */
+
+body{
+background-image:url('background.png');
+background-repeat:no-repeat;
+background-attachment:fixed;
+background-position:center;
+background-color: #05446a;
+}
+
+.choices{
+position: relative;
+top:-100px;
+left: 300px;
+}
+
+.list{
+padding: 20px;
+}
+
+select{
+width:250px;
+height:60px;
+font-size: 30px;
+font: cambria;
+font-align:center;
+}
+
+input[type="button"]{
+position: relative;
+top:70px;
+left: -230px;
+height:40px;
+width:200px;
+font-size: 30px;
+}
+
+.friendbox{
+position: relative;
+width:250px;
+height:300px;
+top:250px;
+right:-700px;
+background-color:#F0F0F0;
+}
+
+.moviebox{
+position: relative;
+width:700px;
+height:2500px;
+top:30px;
+left:270px;
+background-color:#F0F0F0;
+}
