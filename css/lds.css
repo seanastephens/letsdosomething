@@ -1,0 +1,12 @@
+@charset "UTF-8";
+
+/* Styles for comman elements -------------------------------------------- */
+
+body {
+background-image: url{"http://www2.engr.arizona.edu/~taylordixon/letsdosomething/background.png"};
+background-repeat:no-repeat;
+background-attachment:fixed;
+background-position:center;
+}
+
+
