@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="keywords" content="let's do something">
@@ -7,219 +8,198 @@
     <title>Let's Do Something</title>
     <link rel="stylesheet" type="text/css" href="default_style.css">
 </head>
+
 <body>
-    <div id="fb-root"></div>	
+    <div id="fb-root"></div>
     <script type="text/javascript" src="jquery-2.1.0.js"></script>
     <script type="text/javascript">
+        var FB;
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '299220656893010',
+                status: true,
+                xfbml: true
+            });
+        };
 
-    var FB;
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId      : '299220656893010',
-            status     : true,
-            xfbml      : true
-        });
-    };
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
 
-    (function(d, s, id){
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {return;}
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/en_US/all.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
+        /***********************************************
+         * Drop down menu w/ description- � Dynamic Drive (www.dynamicdrive.com)
+         * This notice must stay intact for use
+         * Visit http://www.dynamicdrive.com/ for full source code
+         ***********************************************/
 
-    /***********************************************
-   * Drop down menu w/ description- � Dynamic Drive (www.dynamicdrive.com)
-    * This notice must stay intact for use
-     * Visit http://www.dynamicdrive.com/ for full source code
-      ***********************************************/
+         // Now, see 2) below for final customization step
 
-// Now, see 2) below for final customization step
-
-function displaydesc(which, descriptionarray, container) {
-    if (document.getElementById) {
-        document.getElementById(container).innerHTML = descriptionarray[which.selectedIndex];
-    }
-}
-
-function assignAll(genre, time, d) {
-
-    assigngenre(genre);
-    assigntime(time);
-    assigndate(d);
-
-    FB.api('/me', "get", function (response) {
-        window.fID = response["id"];
-        window.floc = response["location"]["name"];
-        window.fgenr = "Action"; //TODO: fix this
-        console.log(response);
-        console.log(window.fID);
-        console.log(window.floc);
-        console.log(window.fgenr);
-
-    $(".moviebox").empty();
-    $.ajax({
-         url: 'scrape.php',
-         type: 'get',
-         data: ('genre=' +  window.fgenr + '&user_location=' +  window.floc + '&uid=' + window.fID),
-         success: function(data) { 
-            $(".moviebox").append(data);
-         } 
-     });
-    $(".friendbox").empty();
-    $.ajax({
-         url: 'friendbox.php',
-         type: 'get',
-         data: ('genre=' +  window.fgenr),
-         success: function(data) { 
-            $(".friendbox").append(data);
-         } 
-    });
-});
-}
-
-function assigngenre(what) {
-    var selectedopt = what.options[what.selectedIndex];
-    if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-        window.fgenr = selectedopt.value;
-    }
-}
-
-function assigntime(what) {
-    var selectedopt = what.options[what.selectedIndex];
-    if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-        window.time = selectedopt.value;
-    }
-}
-
-function assigndate(what) {
-    var selectedopt = what.options[what.selectedIndex];
-    if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-        window.date = selectedopt.value;
-    }
-}
-
-
-//2) Call function displaydesc() for each drop down menu you have on the page
-//   This function displays the initial description for the selected menu item
-//   displaydesc(name of select menu, name of corresponding text array, ID of SPAN container tag):
-//   Important: Remove the calls not in use (ie: 2nd line below if there's only 1 menu on your page)
-
-displaydesc(document.form1.Genre, thetext1, 'textcontainer1');
-displaydesc(document.form2.Time, thetext2, 'textcontainer1');
-displaydesc(document.form3.Date, thetext3, 'textcontainer1');
-
-function invite() {
-    FB.ui({
-        method: 'send',
-        user_prompt_message: 'Hi! Join me for a movie today.',
-        link: "http://www.google.com", 
-    },
-    function (response) {
-        if (response && response.post_id) {
-            alert('Post was published.');
-        } else {
-            alert('Post was not published.');
+        function displaydesc(which, descriptionarray, container) {
+            if (document.getElementById) {
+                document.getElementById(container).innerHTML = descriptionarray[which.selectedIndex];
+            }
         }
-    });
-}
 
+        function assignAll(genre, time, d) {
 
+            assigngenre(genre);
+            assigntime(time);
+            assigndate(d);
 
+            FB.api('/me', "get", function (response) {
+                window.fID = response["id"];
+                window.floc = response["location"]["name"];
+                window.fgenr = "Action"; //TODO: fix assign genre 
+                console.log("[index.html] Response from FB.api('/me') -> ID        : " + window.fID);
+                console.log("[index.html] Response from FB.api('/me') -> Location  : " + window.floc);
+                console.log("[index.html] Response from FB.api('/me') -> Genre     : " + window.fgenr);
+                // console.log(response); //This line logs the entire object returned from FB.api
 
+                $(".moviebox").empty();
+                $.ajax({
+                    url: 'scrape.php',
+                    type: 'get',
+                    data: ('genre=' + window.fgenr + '&user_location=' + window.floc + '&uid=' + window.fID),
+                    success: function (data) {
+                        $(".moviebox").append(data);
+                    }
+                });
+                $(".friendbox").empty();
+                $.ajax({
+                    url: 'friendbox.php',
+                    type: 'get',
+                    data: ('genre=' + window.fgenr),
+                    success: function (data) {
+                        $(".friendbox").append(data);
+                    }
+                });
+            });
+        }
+
+        function assigngenre(what) {
+            var selectedopt = what.options[what.selectedIndex];
+            if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
+                window.fgenr = selectedopt.value;
+            }
+        }
+
+        function assigntime(what) {
+            var selectedopt = what.options[what.selectedIndex];
+            if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
+                window.time = selectedopt.value;
+            }
+        }
+
+        function assigndate(what) {
+            var selectedopt = what.options[what.selectedIndex];
+            if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
+                window.date = selectedopt.value;
+            }
+        }
+
+         //2) Call function displaydesc() for each drop down menu you have on the page
+         //   This function displays the initial description for the selected menu item
+         //   displaydesc(name of select menu, name of corresponding text array, ID of SPAN container tag):
+         //   Important: Remove the calls not in use (ie: 2nd line below if there's only 1 menu on your page)
+
+        displaydesc(document.form1.Genre, thetext1, 'textcontainer1');
+        displaydesc(document.form2.Time, thetext2, 'textcontainer1');
+        displaydesc(document.form3.Date, thetext3, 'textcontainer1');
+
+        function invite() {
+            FB.ui({
+                    method: 'send',
+                    user_prompt_message: 'Hi! Join me for a movie today.',
+                    link: "http://www.google.com",
+                },
+                function (response) {
+                    if (response && response.post_id) {
+                        alert('Post was published.');
+                    } else {
+                        alert('Post was not published.');
+                    }
+                });
+        }
     </script>
-  <div class="friendbox">
-	 
-</div>
-	
-	
-	<div class="choices">
-	<div class="list">
-		<form name="form1">
-		<select name="Genre" size="1" onchange="displaydesc(document.form1.Genre, thetext1, 'textcontainer1')">
-			<option value="0">Movie Genre</option>
-			<option selected="selected" value="Action">Action</option>		
-			<option value="Horror">Horror</option>
-			<option value="Comedy">Comedy</option>
-			<option value="Drama">Drama</option>
-			<option value="t">t</option>
-			<option value="Thriller">Thriller</option>
-
-		</select>
-
-			<span id="textcontainer1" align="left" style="font:italic 18px Arial">
+    <div class="friendbox">
+    </div>
+    <div class="choices">
+        <div class="list">
+            <form name="form1">
+                <select name="Genre" size="1" onchange="displaydesc(document.form1.Genre, thetext1, 'textcontainer1')">
+                    <option value="0">Movie Genre</option>
+                    <option selected="selected" value="Action">Action</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Comedy">Comedy</option>
+                    <option value="Drama">Drama</option>
+                    <option value="t">t</option>
+                    <option value="Thriller">Thriller</option>
+                </select>
+                <span id="textcontainer1" align="left" style="font:italic 18px Arial">
 		</span>
-		</form>
-	</div>
-	<div class="list">
-		<form name="form2">
-		<select name="Time" size="1" onchange="displaydesc(document.form1.Time, thetext2, 'textcontainer1')">
-			<option value="0">Time</option>
-			<option selected="selected" value="17">5 pm</option>
-			<option value="18">6 pm</option>
-			<option value="19">7 pm</option>
-			<option value="20">8 pm</option>
-			<option value="21">9 pm</option>
-			<option value="22">10 pm</option>
-			<option value="23">11 pm</option>
-			<option value="24">12 am</option>
-			<option value="1">1 am</option>
-			<option value="2">2 am</option>
-			<option value="3">3 am</option>
-			<option value="4">4 am</option>
-			<option value="5">5 am</option>
-			<option value="6">6 am</option>
-			<option value="7">7 am</option>
-			<option value="8">8 am</option>
-			<option value="9">9 am</option>
-			<option value="10">10 am</option>
-			<option value="11">11 am</option>
-			<option value="12">12 pm</option>
-			<option value="13">1 pm</option>
-			<option value="14">2 pm</option>
-			<option value="15">3 pm</option>
-			<option value="16" target="newwin">4 pm</option>
-		</select>
-	 	
-			<span id="textcontainer2" align="left" style="font:italic 13px Arial">
+            </form>
+        </div>
+        <div class="list">
+            <form name="form2">
+                <select name="Time" size="1" onchange="displaydesc(document.form1.Time, thetext2, 'textcontainer1')">
+                    <option value="0">Time</option>
+                    <option selected="selected" value="17">5 pm</option>
+                    <option value="18">6 pm</option>
+                    <option value="19">7 pm</option>
+                    <option value="20">8 pm</option>
+                    <option value="21">9 pm</option>
+                    <option value="22">10 pm</option>
+                    <option value="23">11 pm</option>
+                    <option value="24">12 am</option>
+                    <option value="1">1 am</option>
+                    <option value="2">2 am</option>
+                    <option value="3">3 am</option>
+                    <option value="4">4 am</option>
+                    <option value="5">5 am</option>
+                    <option value="6">6 am</option>
+                    <option value="7">7 am</option>
+                    <option value="8">8 am</option>
+                    <option value="9">9 am</option>
+                    <option value="10">10 am</option>
+                    <option value="11">11 am</option>
+                    <option value="12">12 pm</option>
+                    <option value="13">1 pm</option>
+                    <option value="14">2 pm</option>
+                    <option value="15">3 pm</option>
+                    <option value="16" target="newwin">4 pm</option>
+                </select>
+                <span id="textcontainer2" align="left" style="font:italic 13px Arial">
 		</span>
-		</form>
-	</div>
-	<div class="list">
-		<form name="form3">
-		<select name="Date" size="1" onchange="displaydesc(document.form1.Date, thetext3, 'textcontainer1')">
-			<option selectvalue="0">DATE</option>
-			<option value="1">Sunday</option>
-			<option selected="selected" value="2">Monday</option>
-			<option value="3">Tuesday</option>
-			<option value="4">Wednesday</option>
-			<option value="5">Thursday</option>
-			<option value="6">Friday</option>
-			<option value="7" target="newwin">Saturday</option>
-			</select>
-		
-		<span id="textcontainer3" align="left" style="font:italic 13px Arial">
+            </form>
+        </div>
+        <div class="list">
+            <form name="form3">
+                <select name="Date" size="1" onchange="displaydesc(document.form1.Date, thetext3, 'textcontainer1')">
+                    <option selectvalue="0">DATE</option>
+                    <option value="1">Sunday</option>
+                    <option selected="selected" value="2">Monday</option>
+                    <option value="3">Tuesday</option>
+                    <option value="4">Wednesday</option>
+                    <option value="5">Thursday</option>
+                    <option value="6">Friday</option>
+                    <option value="7" target="newwin">Saturday</option>
+                </select>
+                <span id="textcontainer3" align="left" style="font:italic 13px Arial">
 		</span>
-	 	<input value="Check Movies" onclick="assignAll(document.form1.Genre, document.form2.Time,document.form3.Date)" type="button"><br>
-			
-			
-	</form>
-	</div>
-	</div>
+                <input value="Check Movies" onclick="assignAll(document.form1.Genre, document.form2.Time,document.form3.Date)" type="button">
+                <br>
+            </form>
+        </div>
+    </div>
+    <div class="moviebox">
+    </div>
+</body>
 
-	<div class="moviebox">
-	
-	</div>
-	
-
-
-
-
-	
-	
-
-
-
-
-</body></html>
+</html>
