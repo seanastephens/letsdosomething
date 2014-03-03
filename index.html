@@ -1,39 +1,33 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="keywords" content="let's do something">
     <meta name="description" content="Facebook powered movie checker">
     <title>Let's Do Something</title>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script> 
     <link rel="stylesheet" type="text/css" href="default_style.css">
 </head>
 <body>
     <div id="fb-root"></div>	
+    <script type="text/javascript" src="jquery-2.1.0.js"></script>
     <script type="text/javascript">
 
-    window.fbAsyncInit = function () {
+    var FB;
+    window.fbAsyncInit = function() {
         FB.init({
-            appId: '299220656893010',
-            status: true, // check login status
-            cookie: true, 
-            xfbml: true // parse XFBML
+            appId      : '299220656893010',
+            status     : true,
+            xfbml      : true
         });
-    }
+    };
 
-    function (d, s, id) {
+    (function(d, s, id){
         var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-            return;
-        }
-        js = d.createElement(s);
-        js.id = id;
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
         js.src = "//connect.facebook.net/en_US/all.js";
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
-    $(document).ready(function () {
-        init_fb();
-    });
 
     /***********************************************
    * Drop down menu w/ description- � Dynamic Drive (www.dynamicdrive.com)
@@ -41,104 +35,68 @@
      * Visit http://www.dynamicdrive.com/ for full source code
       ***********************************************/
 
-    function init_fb() {
-    FB.Event.subscribe('auth.authResponseChange', function (response) {
-        // Here we specify what we do with the response anytime this event occurs. 
-        if (response.status === 'connected') {
-        // The response object is returned with a status field that lets the app know the current
-        // login status of the person. In this case, we're handling the situation where they 
-        // have logged in to the app.
-            testAPI();
-        } else if (response.status === 'not_authorized') {
-        // In this case, the person is logged into Facebook, but not into the app, so we call
-        // FB.login() to prompt them to do so. 
-        // In real-life usage, you wouldn't want to immediately prompt someone to login 
-        // like this, for two reasons:
-        // (1) JavaScript created popup windows are blocked by most browsers unless they 
-        // result from direct interaction from people using the app (such as a mouse click)
-        // (2) it is a bad experience to be continually prompted to login upon page load.
-            FB.login();
-        } else {
-        // In this case, the person is not logged into Facebook, so we call the login() 
-        // function to prompt them to do so. Note that at this stage there is no indication
-        // of whether they are logged into the app. If they aren't then they'll see the Login
-        // dialog right after they log in to Facebook. 
-        // The same caveats as above apply to the FB.login() call here.
-            FB.login();
-        }
-    });
-}
-
-// Here we run a very simple test of the Graph API after login is successful. 
-// This testAPI() function is only called in those cases. 
-    function testAPI() {
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function (response) {
-    console.log('Good to see you, ' + response.name + '.');
-    });
-}
-
-
-
-
 // Now, see 2) below for final customization step
-var genr;
 
-    function displaydesc(which, descriptionarray, container) {
+function displaydesc(which, descriptionarray, container) {
     if (document.getElementById) {
         document.getElementById(container).innerHTML = descriptionarray[which.selectedIndex];
     }
 }
-    function assignAll(genre, time, d) {
+
+function assignAll(genre, time, d) {
+
     assigngenre(genre);
     assigntime(time);
     assigndate(d);
+
+    FB.api('/me', "get", function (response) {
+        window.fID = response["id"];
+        window.floc = response["location"]["name"];
+        window.fgenr = "Action"; //TODO: fix this
+        console.log(response);
+        console.log(window.fID);
+        console.log(window.floc);
+        console.log(window.fgenr);
+
     $(".moviebox").empty();
-
-    var ID;
-    var loc;
-    FB.api('/me', function (response) {
-        ID = response.id;
-        loc = response.location;
-        });
-
-    $.get('scrape.php', {
-        genre: genr,
-        user_location: loc,
-        uid: ID
-        })
-    .done(function (data) {
-        $(".moviebox").append(data);
-        });
+    $.ajax({
+         url: 'scrape.php',
+         type: 'get',
+         data: ('genre=' +  window.fgenr + '&user_location=' +  window.floc + '&uid=' + window.fID),
+         success: function(data) { 
+            $(".moviebox").append(data);
+         } 
+     });
     $(".friendbox").empty();
-    $.get('friendbox.php', {
-        genre: genr
-        })
-    .done(function (data) {
-        $(".friendbox").append(data);
-        });
+    $.ajax({
+         url: 'friendbox.php',
+         type: 'get',
+         data: ('genre=' +  window.fgenr),
+         success: function(data) { 
+            $(".friendbox").append(data);
+         } 
+    });
+});
 }
 
-    function assigngenre(what) {
+function assigngenre(what) {
     var selectedopt = what.options[what.selectedIndex];
     if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-        genr = selectedopt.value;
+        window.fgenr = selectedopt.value;
     }
 }
 
-    function assigntime(what) {
-    var time;
+function assigntime(what) {
     var selectedopt = what.options[what.selectedIndex];
     if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-        time = selectedopt.value;
+        window.time = selectedopt.value;
     }
 }
 
-    function assigndate(what) {
-    var date;
+function assigndate(what) {
     var selectedopt = what.options[what.selectedIndex];
     if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-        date = selectedopt.value;
+        window.date = selectedopt.value;
     }
 }
 
@@ -152,7 +110,7 @@ displaydesc(document.form1.Genre, thetext1, 'textcontainer1');
 displaydesc(document.form2.Time, thetext2, 'textcontainer1');
 displaydesc(document.form3.Date, thetext3, 'textcontainer1');
 
-    function invite() {
+function invite() {
     FB.ui({
         method: 'send',
         user_prompt_message: 'Hi! Join me for a movie today.',
