@@ -3,14 +3,28 @@ require 'facebook.php';
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
+/*
+ * Check that required parameters are present, and store them.
+ */
 if (!isset($_GET["genre"])) {
     echo("No 'genre' parameter passed!");
+    die();
+}
+
+if (!isset($_GET["token"])) {
+    echo("No 'token' parameter passed!");
     die();
 }
 
 $genre    = $_GET['genre'];
 $filename = 'genres/' . $genre . '.txt';
 
+$token = $_GET['token'];
+
+/*
+ * If $genre is a valid filename, read all the titles from that file into
+ * an array.
+ */
 if (file_exists($filename)) {
     $handle = fopen('genres/' . $genre . '.txt', "r");
     if ($handle) {
@@ -29,22 +43,35 @@ $config = array(
     'appId' => '299220656893010',
     'secret' => '6d27ff1e8509d4fd017f16ed23cae89b',
     'allowSignedRequest' => false, // optional, but should be false
-    'cookie' => true
 );
 
-$facebook = new Facebook($config);
-$user     = $facebook->getUser();
+/*
+ * Try to pull info from the facebook API. This is the code that is 
+ * having problems with curllib. FIXME
+ */
+try{
+
+    $facebook = new Facebook($config);
+    $user     = $facebook->getUser();
+    $facebook->setAccessToken($token);
+    $info = $facebook->api('/me?fields=location,friends.fields(name,movies)');
+
+} catch (Exception $e) {
+    echo 'caught an exception';
+    echo '<br>';
+    echo $e;
+}
 
 if (!$user) {
-    $loginUrl = $facebook->getLoginUrl(array(
-        'scope' => 'user_friends, friends_likes, publish_stream'
-    ));
-    echo "Login using Facebook <a href=" . $loginUrl . ">here</a>";
+    echo "User not logged in!";
     die();
 }
 
-$info = $facebook->api('/me?fields=location,friends.fields(name,movies)');
-
+/*
+ * Code below here assumes $info is good. Just checks the friend list for 
+ * matches between liked movies and the titles in $movietitles that we 
+ * loaded earlier, and produces checkbox html.
+ */
 $friends = $info['friends']['data'];
 
 echo '<form>';

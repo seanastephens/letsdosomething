@@ -13,13 +13,22 @@
     <div id="fb-root"></div>
     <script type="text/javascript" src="jquery-2.1.0.js"></script>
     <script type="text/javascript">
-        var FB;
+        /*
+         * Global variables: uid, token, and loc all need to pass from the 
+         * FB JS-SDK to our assignall function.
+         */
+        var uid;
+        var token;
+        var loc;
         window.fbAsyncInit = function () {
             FB.init({
                 appId: '299220656893010',
                 status: true,
-                xfbml: true
+                xfbml: true,
+                cookie: true
             });
+            // Custom code
+            custom_login();
         };
 
         (function (d, s, id) {
@@ -31,8 +40,47 @@
             js.id = id;
             js.src = "//connect.facebook.net/en_US/all.js";
             fjs.parentNode.insertBefore(js, fjs);
+
+           
         }(document, 'script', 'facebook-jssdk'));
 
+        function custom_login() {
+            FB.getLoginStatus(function(response) {
+                if(response.status === 'connected') {
+                    // User is logged in.
+                    uid = response.authResponse.userID;
+                    token = response.authResponse.accessToken;
+                    FB.api('/me', {fields: 'location'}, function(response) {
+                        loc = response.location.name;
+                        // Logs the entire response object. Can be 
+                        // 'opened' in inspect element.
+                        // console.log(response); 
+                        });
+                    console.log("User is already logged in.");
+                } else {
+                    // User is not logged in or has not authenticated.
+                    console.log("User is not logged in; prompting.");
+                    FB.login({scope: 'user_friends,friends_likes,publish_stream'}, 
+                        function(response) {
+                        if(response.authResponse) {
+                            console.log("User is now logged in.");
+                            uid = response.authResponse.userID;
+                            token = response.authResponse.accessToken;
+                            FB.api('/me', {fields: 'location'}, function(response) {
+                                loc = response.location.name;
+                                // Logs the entire response object. Can be 
+                                // 'opened' in inspect element.
+                                // console.log(response); 
+                                });
+                        } else {
+                            console.log("User chose not to log in.");
+                            // TODO Deal with people that don't login when 
+                            // prompted or don't agree to the permissions.
+                        }
+                    });
+                }
+            }); 
+        }
         /***********************************************
          * Drop down menu w/ description- � Dynamic Drive (www.dynamicdrive.com)
          * This notice must stay intact for use
@@ -49,20 +97,20 @@
 
         function assignAll(form) {
 
-            FB.api('/me', "get", function (response) {
-                window.fID = response["id"];
-                //window.floc = response["location"]["name"];
-                window.fgenr = form.Genre.value; //"Action"; //TODO: fix assign genre 
-                console.log("[index.html] Response from FB.api('/me') -> ID        : " + window.fID);
-                console.log("[index.html] Response from FB.api('/me') -> Location  : " + window.floc);
-                console.log("[index.html] Response from FB.api('/me') -> Genre     : " + window.fgenr);
-                // console.log(response); //This line logs the entire object returned from FB.api
+            genr = form.Genre.value;
+
+                console.log("[index.html] Response from FB.api('/me') -> ID        : " 
+                    + uid);
+                console.log("[index.html] Response from FB.api('/me') -> Location  : " 
+                    + loc);
+                console.log("[index.html] Response from FB.api('/me') -> Genre     : " 
+                    + genr);
 
                 $(".moviebox").empty();
                 $.ajax({
                     url: 'scrape.php',
                     type: 'get',
-                    data: ('genre=' + window.fgenr + '&user_location=' + window.floc + '&uid=' + window.fID),
+                    data: ('genre=' + genr + '&user_location=' + loc + '&uid=' + uid),
                     success: function (data) {
                         $(".moviebox").append(data);
                     }
@@ -71,18 +119,17 @@
                 $.ajax({
                     url: 'friendbox.php',
                     type: 'get',
-                    data: ('genre=' + window.fgenr),
+                    data: ('genre=' + genr + '&token=' + token),
                     success: function (data) {
                         $(".friendbox").append(data);
                     }
                 });
-            });
-        }
+            }
 
         function assigngenre(what) {
             var selectedopt = what.options[what.selectedIndex];
             if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-                window.fgenr = selectedopt.value;
+                genr = selectedopt.value;
                 alert("selectedopt.value");
                 return selectedopt.value;
             }
