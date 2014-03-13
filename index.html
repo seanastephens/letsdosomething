@@ -20,6 +20,11 @@
         var uid;
         var token;
         var loc;
+
+        /*
+         * This function is straight from the FB JS-SDK examples. Our code is in
+         * the callback function.
+         */
         window.fbAsyncInit = function () {
             FB.init({
                 appId: '299220656893010',
@@ -44,6 +49,12 @@
            
         }(document, 'script', 'facebook-jssdk'));
 
+
+        /*
+         * The log in function. If the user is logged in, it grabs their ID
+         * and an access token; if not, it tries to log them in and then tries
+         * to get their ID/access token.
+         */
         function custom_login() {
             FB.getLoginStatus(function(response) {
                 if(response.status === 'connected') {
@@ -52,9 +63,11 @@
                     token = response.authResponse.accessToken;
                     FB.api('/me', {fields: 'location'}, function(response) {
                         loc = response.location.name;
-                        // Logs the entire response object. Can be 
+
+                        // This line logs the entire response object. Can be 
                         // 'opened' in inspect element.
                         // console.log(response); 
+
                         });
                     console.log("User is already logged in.");
                 } else {
@@ -68,9 +81,11 @@
                             token = response.authResponse.accessToken;
                             FB.api('/me', {fields: 'location'}, function(response) {
                                 loc = response.location.name;
-                                // Logs the entire response object. Can be 
+
+                                // This line logs the entire response object. Can be 
                                 // 'opened' in inspect element.
                                 // console.log(response); 
+
                                 });
                         } else {
                             console.log("User chose not to log in.");
@@ -81,19 +96,29 @@
                 }
             }); 
         }
+
         /***********************************************
          * Drop down menu w/ description- � Dynamic Drive (www.dynamicdrive.com)
          * This notice must stay intact for use
          * Visit http://www.dynamicdrive.com/ for full source code
          ***********************************************/
 
-         // Now, see 2) below for final customization step
+        //   This function displays the initial description for the selected menu item
+        //   displaydesc(name of select menu, name of corresponding text array, 
+        //   ID of SPAN container tag):
+        //   Important: Remove the calls not in use (ie: 2nd line below if there's 
+        //   only 1 menu on your page)
 
         function displaydesc(which, descriptionarray, container) {
             if (document.getElementById) {
                 document.getElementById(container).innerHTML = descriptionarray[which.selectedIndex];
             }
         }
+
+        displaydesc(document.form1.Genre, thetext1, 'textcontainer1');
+        displaydesc(document.form2.Time, thetext2, 'textcontainer1');
+        displaydesc(document.form3.Date, thetext3, 'textcontainer1');
+
 
         function assignAll(form) {
 
@@ -126,38 +151,11 @@
                 });
             }
 
-        function assigngenre(what) {
-            var selectedopt = what.options[what.selectedIndex];
-            if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-                genr = selectedopt.value;
-                alert("selectedopt.value");
-                return selectedopt.value;
-            }
-        }
 
-        function assigntime(what) {
-            var selectedopt = what.options[what.selectedIndex];
-            if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-                window.time = selectedopt.value;
-            }
-        }
-
-        function assigndate(what) {
-            var selectedopt = what.options[what.selectedIndex];
-            if (document.getElementById && selectedopt.getAttribute("target") == "newwin") {
-                window.date = selectedopt.value;
-            }
-        }
-
-         //2) Call function displaydesc() for each drop down menu you have on the page
-         //   This function displays the initial description for the selected menu item
-         //   displaydesc(name of select menu, name of corresponding text array, ID of SPAN container tag):
-         //   Important: Remove the calls not in use (ie: 2nd line below if there's only 1 menu on your page)
-
-        displaydesc(document.form1.Genre, thetext1, 'textcontainer1');
-        displaydesc(document.form2.Time, thetext2, 'textcontainer1');
-        displaydesc(document.form3.Date, thetext3, 'textcontainer1');
-
+        /*
+         * Called on 'invite' button press; TODO set this up to accept selected
+         * friends instead of having an empty 'to' field.
+         */
         function invite() {
             FB.ui({
                     method: 'send',
@@ -172,6 +170,8 @@
                     }
                 });
         }
+
+
     </script>
     <div class="friendbox">
     </div>

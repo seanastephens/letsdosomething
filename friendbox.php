@@ -76,11 +76,20 @@ $friends = $info['friends']['data'];
 
 echo '<form>';
 $foundFriend = false;
+                            
+// For all friends and movie titles
 for ($i = 0; $i < sizeof($friends); $i++) {
     for ($j = 0; $j < sizeof($movietitle); $j++) {
+
+        // If the friend has movie likes
         if (isset($friends[$i]['movies'])) {
+
+            // Check each of their movie likes against the movie title.
             for ($k = 0; $k < sizeof($friends[$i]['movies']['data']); $k++) {
                 if ($friends[$i]['movies']['data'][$k]['name'] === $movietitle[$j]) {
+                    
+                    // Print out an html checkbox; 'break 2' stops the same friend
+                    // from being printed multiple times.
                     $foundFriend = true;
                     echo '<input type="checkbox" name="friend" value="' . trim($friends[$i]['name']) . '">';
                     echo $friends[$i]['name'];
